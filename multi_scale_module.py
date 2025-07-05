@@ -4,27 +4,19 @@ from torch.nn import functional as F
 from torch.nn import Conv2d, Parameter, Softmax
 
 class SpatialAttention(nn.Module):
-    def __init__(self, in_channels):
+        def __init__(self):
         super(SpatialAttention, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels, in_channels // 8, kernel_size=1)
-        self.conv2 = nn.Conv2d(in_channels // 8, 1, kernel_size=1)
+        self.conv1 = nn.Conv2d(2, 1, kernel_size=3, padding=1, bias=False)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        avg_pool = F.avg_pool2d(x, kernel_size=x.size()[2:])
-        max_pool = F.max_pool2d(x, kernel_size=x.size()[2:])
-
-        x1 = self.conv1(avg_pool)
-        x2 = self.conv1(max_pool)
-
-        x1 = self.conv2(x1)
-        x2 = self.conv2(x2)
-
-        x = x1 + x2
-        x = self.sigmoid(x)
+        avg_out = torch.mean(x, dim=1, keepdim=True)
+        max_out, _ = torch.max(x, dim=1, keepdim=True)
+        cat = torch.cat([avg_out, max_out], dim=1)
+        out = self.conv1(cat)
+        x = self.sigmoid(out)
 
         return x
-
 ###NMS
 class NMS(nn.Module):
     def __init__(self, dim,in_dim):
@@ -32,7 +24,7 @@ class NMS(nn.Module):
         self.down_conv = nn.Sequential(nn.Conv2d(dim, in_dim, 3, padding=1), nn.BatchNorm2d(in_dim),nn.PReLU())
         down_dim = in_dim // 2
         # 添加空间注意力模块实例化
-        self.spatial_attn = SpatialAttention(in_dim)
+        self.spatial_attn = SpatialAttention()
         self.conv2 = nn.Sequential(
             nn.Conv2d(in_dim, down_dim, kernel_size=3, dilation=2, padding=2), nn.BatchNorm2d(down_dim), nn.PReLU()
         )
