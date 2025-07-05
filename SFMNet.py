@@ -42,21 +42,19 @@ class ChannelAttention(nn.Module):
 
 # 空间注意力模块，卷积核大小设置为 3
 class SpatialAttention(nn.Module):
-    def __init__(self, kernel_size=3):
+        def __init__(self):
         super(SpatialAttention, self).__init__()
-
-        assert kernel_size in (3, 7), 'kernel size must be 3 or 7'
-        padding = 3 if kernel_size == 7 else 1
-
-        self.conv1 = nn.Conv2d(2, 1, kernel_size, padding=padding, bias=False)
+        self.conv1 = nn.Conv2d(1, 1, kernel_size=3, padding=1, bias=False)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        avg_out = torch.mean(x, dim=1, keepdim=True)
+        #avg_out = torch.mean(x, dim=1, keepdim=True)
         max_out, _ = torch.max(x, dim=1, keepdim=True)
-        x_l = torch.cat([avg_out, max_out], dim=1)
-        s_a = self.sigmoid(self.conv1(x_l))
-        return s_a*x
+        #cat = torch.cat([avg_out, max_out], dim=1)
+        out = self.conv1(max_out)
+        x =self.sigmoid(out)*x
+
+        return x
 
 # SAIE 模块
 class SAIE(nn.Module):
