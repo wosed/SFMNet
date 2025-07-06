@@ -2,7 +2,7 @@ import numpy as np
 import os
 import torch
 from test_data import test_dataset
-from saliency_metric import cal_mae,cal_fm,cal_sm,cal_em,cal_wfm,cal_f2m,cal_s2m,cal_e2m
+from saliency_metric import cal_mae,cal_fm,cal_sm,cal_em,cal_wfm
 # 改设备管理
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 dataset_path = './Image/NLPR/testsetNL'
@@ -20,9 +20,7 @@ for dataset in test_datasets:
     gt_root = dataset_path  +'/GT/'
     test_loader = test_dataset(sal_root, gt_root)
     mae,fm,sm,em,wfm= cal_mae(),cal_fm(test_loader.size),cal_sm(),cal_em(),cal_wfm()
-    f2m = cal_f2m(test_loader.size)
-    s2m = cal_s2m()
-    e2m = cal_e2m()
+
     for i in range(test_loader.size):
         print ('predicting for %d / %d' % ( i + 1, test_loader.size))
         sal, gt = test_loader.load_data()
@@ -44,10 +42,7 @@ for dataset in test_datasets:
         fm.update(res, gt)
         em.update(res,gt)
         wfm.update(res,gt)
-        # 更新新增指标
-        f2m.update(res, gt)
-        s2m.update(res, gt)
-        e2m.update(res, gt)
+
 
 
     MAE = mae.show()
@@ -59,5 +54,5 @@ for dataset in test_datasets:
     maxf2, changeable_fm2, precision2, recall2 = f2m.show()
     sm2_score = s2m.show()
     em2_score = e2m.show()
-    print('dataset: {} MAE: {:.4f} maxF: {:.4f} avgF: {:.4f} wfm: {:.4f} Sm: {:.4f} Em: {:.4f}  F2: {:.4f} S2: {:.4f} E2: {:.4f}'.format(
-            dataset, MAE, maxf, meanf, wfm, sm,em,  maxf2, sm2_score,em2_score))
+    print('dataset: {} MAE: {:.4f} maxF: {:.4f} avgF: {:.4f} wfm: {:.4f} Sm: {:.4f} Em: {:.4f} '.format(
+            dataset, MAE, maxf, meanf, wfm, sm,em))
