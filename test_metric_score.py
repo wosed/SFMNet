@@ -50,9 +50,6 @@ for dataset in test_datasets:
     sm = sm.show()
     em = em.show()
     wfm = wfm.show()
-    # 新增指标结果
-    maxf2, changeable_fm2, precision2, recall2 = f2m.show()
-    sm2_score = s2m.show()
-    em2_score = e2m.show()
+
     print('dataset: {} MAE: {:.4f} maxF: {:.4f} avgF: {:.4f} wfm: {:.4f} Sm: {:.4f} Em: {:.4f} '.format(
             dataset, MAE, maxf, meanf, wfm, sm,em))
