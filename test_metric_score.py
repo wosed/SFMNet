@@ -44,7 +44,6 @@ for dataset in test_datasets:
         wfm.update(res,gt)
 
 
-
     MAE = mae.show()
     maxf,meanf,_,_ = fm.show()
     sm = sm.show()
